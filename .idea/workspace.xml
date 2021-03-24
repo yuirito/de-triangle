@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="31fa58ec-ce6c-4ad6-886e-2743569e158e" name="Default Changelist" comment="" />
+    <list default="true" id="31fa58ec-ce6c-4ad6-886e-2743569e158e" name="Default Changelist" comment="triangle find 3.24" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="ProjectId" id="1q3aBwaFwjLELi13Z0DkmP6dEVr" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -27,6 +31,18 @@
       <option name="presentableId" value="Default" />
       <updated>1616310595514</updated>
     </task>
+    <task id="LOCAL-00001" summary="triangle find 3.24">
+      <created>1616562650941</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1616562650942</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="triangle find 3.24" />
+    <option name="LAST_COMMIT_MESSAGE" value="triangle find 3.24" />
   </component>
 </project>
