@@ -16,7 +16,7 @@ from scripts import shredFacts
 class Dataset:
     """Implements the specified dataloader"""
     def __init__(self, 
-                 ds_name,tri_path,tri_load):
+                 ds_name,tri_path,tri_load,data_tri_path,data_tri_load):
         """
         Params:
                 ds_name : name of the dataset 
@@ -30,6 +30,8 @@ class Dataset:
         self.triangle = {}
         self.data_triangle = {}
         self.triangle_sorted = []
+        self.factWithtri = [0,0,0,0]
+
         self.data = {"train": self.readFile(self.ds_path + "train.txt"),
                      "valid": self.readFile(self.ds_path + "valid.txt"),
                      "test":  self.readFile(self.ds_path + "test.txt")}
@@ -55,8 +57,18 @@ class Dataset:
             with open(self.ds_path + tri_path, "wb") as f:
                 pickle.dump(self.triangle,f)
             self.saveTriangle(self.ds_path + "triangle.txt")
-        print("done")
-        self.triangle_sorted = [k for (k,v) in sorted(self.triangle.items(),key=lambda kv: (kv[1], kv[0]),reverse=True)]
+
+        print("triangle find done")
+
+        if data_tri_load:
+            with open(self.ds_path + data_tri_path,"rb") as f:
+                self.data_triangle["train"] = pickle.load(f)
+        else:
+            self.triangle_sorted = [k for (k, v) in
+                                    sorted(self.triangle.items(), key=lambda kv: (kv[1], kv[0]), reverse=True)]
+            self.constructDataTri()
+
+        print(self.factWithtri)
 
         self.all_facts_as_tuples = set([tuple(d) for d in self.data["train"] + self.data["valid"] + self.data["test"]])
         
@@ -183,7 +195,49 @@ class Dataset:
                 f.write("%d %s\n" %(v,k))
 
 
-    #def find_potential_triangle_top3(self):
+    def constructDataTri(self):
+        i = 0
+        for fact in self.data["train"]:
+            print(i)
+            i = i + 1
+            r = fact[1]
+            y = fact[3]
+            m = fact[4]
+            d = fact[5]
+
+            l = self.find_potential_triangle_top3(r,y,m,d)
+            self.factWithtri[len(l)] =  self.factWithtri[len(l)]+1
+            self.data_triangle["train"] = self.data_triangle["train"]+l
+
+    def find_potential_triangle_top3(self,r,y,m,d):
+        n = 0
+        l=[]
+        for tri in self.triangle_sorted:
+            if n == 3:
+                break
+            else:
+                (r1,r2,r3,flag) = tri
+                if flag == 0:
+                    if r1 == r:
+                        l.append((r2, r3, r, y, m, d, 1, 1))
+                        n=n+1
+                    elif r2 == r:
+                        l.append((r3, r1, r, y, m, d, 1, 1))
+                        n = n + 1
+                    elif r3 == r:
+                        l.append((r1, r2, r, y, m, d, 1, 1))
+                        n = n + 1
+                elif flag == 1:
+                    if r1 == r:
+                        l.append((r2, r3, r, y, m, d, 1, -1))
+                        n=n+1
+                    elif r2 == r:
+                        l.append((r1, r3, r, y, m, d, -1, -1))
+                        n = n + 1
+                    elif r3 == r:
+                        l.append((r2, r1, r, y, m, d, -1, 1))
+                        n = n + 1
+        return l
 
 
 

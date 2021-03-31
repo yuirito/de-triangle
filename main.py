@@ -25,10 +25,11 @@ parser.add_argument('-save_each', help='Save model and validate each K epochs', 
 parser.add_argument('-se_prop', help='Static embedding proportion', type=float, default=0.36)
 parser.add_argument('-triangle_path', help='Dataset triangle path', type=str, default='triangle_dump.txt')
 parser.add_argument('-triangle_load', help='Dataset triangle load flag', type=bool, default=False)
-
+parser.add_argument('-data_tri_path', help='Dataset fact triangle path', type=str, default='data_tri_dump.txt')
+parser.add_argument('-data_tri_load', help='Dataset fact triangle load flag', type=bool, default=False)
 args = parser.parse_args()
 
-dataset = Dataset(args.dataset,args.triangle_path,args.triangle_load)
+dataset = Dataset(args.dataset,args.triangle_path,args.triangle_load,args.data_tri_path,args.data_tri_load)
 
 params = Params(
     ne=args.ne, 
