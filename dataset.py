@@ -28,31 +28,31 @@ class Dataset:
         self.rel2id = {}
         self.relfrq = {}
         self.triangle = {}
-
-
+        self.data_triangle = {}
         self.data = {"train": self.readFile(self.ds_path + "train.txt"),
                      "valid": self.readFile(self.ds_path + "valid.txt"),
                      "test":  self.readFile(self.ds_path + "test.txt")}
-
+        self.data_triangle["train"] = []
         #for k,v in sorted(self.relfrq.items(), key=lambda kv: (kv[1], kv[0]),reverse=True):
             #print(k,v)
         self.start_batch = 0
         self.all_facts_as_tuples = None
         
         self.convertTimes()
+        #print(self.data["train"][0][3],self.data["train"][0][4],self.data["train"][0][5])
         self.ent_list_h = [None for _ in range(self.numEnt()+1)]
         self.ent_list_t = [None for _ in range(self.numEnt() + 1)]
         #self.saveID(self.ds_path + "ent2id.txt",self.ent2id)
         #self.saveID(self.ds_path + "rel2id.txt", self.rel2id)
         if tri_load:
             with open(self.ds_path + tri_path,"rb") as f:
-                self.triangle = pickle.load(f)
+                self.data_triangle["train"] = pickle.load(f)
                 self.saveTriangle(self.ds_path + "triangle.txt")
         else:
             self.entGraph()
             self.findTriangle()
             with open(self.ds_path + tri_path, "wb") as f:
-                pickle.dump(self.triangle,f)
+                pickle.dump(self.data_triangle["train"],f)
             self.saveTriangle(self.ds_path + "triangle.txt")
         print("done")
         self.all_facts_as_tuples = set([tuple(d) for d in self.data["train"] + self.data["valid"] + self.data["test"]])
@@ -98,14 +98,17 @@ class Dataset:
                 h = fact[0]
                 r = fact[1]
                 t = fact[2]
-                if self.ent_list_h[h]==None:
-                    self.ent_list_h[h] = [(r,t)]
+                y = fact[3]
+                m = fact[4]
+                d = fact[5]
+                if self.ent_list_h[h] == None:
+                    self.ent_list_h[h] = [(r, t, y, m, d)]
                 else:
-                    self.ent_list_h[h].append((r,t))
+                    self.ent_list_h[h].append((r, t, y, m, d))
                 if self.ent_list_t[t] == None:
-                    self.ent_list_t[t] = [(r, h)]
+                    self.ent_list_t[t] = [(r, h, y, m ,d)]
                 else:
-                    self.ent_list_t[t].append((r, h))
+                    self.ent_list_t[t].append((r, h, y, m, d))
 
 
     def findTriangle(self):
@@ -113,21 +116,19 @@ class Dataset:
             print(e1)
             if rel_list != None:
                 for j,rel_tuple in enumerate(rel_list):
-                    (r1,e2) = rel_tuple
+                    (r1,e2,y1,m1,d1) = rel_tuple
                     if self.ent_list_h[e2] == None:
                         continue
                     else:
                         for k, rel_tuple2 in enumerate(self.ent_list_h[e2]):
-                            (r2,e3) = rel_tuple2
+                            (r2,e3,y2,m2,d2) = rel_tuple2
                             if self.ent_list_h[e3] == None:
                                 continue
                             else:
                                 for m,rel_tuple3 in enumerate(self.ent_list_h[e3]):
-                                    (r3,e) = rel_tuple3
+                                    (r3,e,y3,m3,d3) = rel_tuple3
                                     if e == e1:
-                                        rel_list = [r1, r2, r3]
-                                        rel_list.sort()
-                                        rel_triangle = (rel_list[0], rel_list[1], rel_list[2], 0)
+                                        rel_triangle = (r1, r2, r3, 0)
                                         if rel_triangle in self.triangle:
                                             self.triangle[rel_triangle] = self.triangle[rel_triangle] + 1
                                             #print ("%d :" % e1)
@@ -135,9 +136,35 @@ class Dataset:
                                         else:
                                             #print ("%d :" % e1)
                                             self.triangle[rel_triangle] = 1
+                                            self.data_triangle["train"].append(rel_triangle)
 
-        for rel in self.triangle:
-            self.triangle[rel] = self.triangle[rel]/3
+
+        for e1, rel_list in enumerate(self.ent_list_t):
+            print(e1)
+            if rel_list != None:
+                for j, rel_tuple in enumerate(rel_list):
+                    (r1, e2, y1, m1, d1) = rel_tuple
+                    if self.ent_list_h[e2] == None:
+                        continue
+                    else:
+                        for k, rel_tuple2 in enumerate(self.ent_list_h[e2]):
+                            (r2, e3, y2, m2, d2) = rel_tuple2
+                            if self.ent_list_h[e3] == None:
+                                continue
+                            else:
+                                for m, rel_tuple3 in enumerate(self.ent_list_h[e3]):
+                                    (r3, e, y3, m3, d3) = rel_tuple3
+                                    if e == e1:
+                                        rel_triangle = (r1,r2,r3,1)
+                                        if rel_triangle in self.triangle:
+                                            self.triangle[rel_triangle] = self.triangle[rel_triangle] + 1
+                                            # print ("%d :" % e1)
+                                            # print("{}:{}".format(rel_triangle,self.triangle[rel_triangle]))
+                                        else:
+                                            # print ("%d :" % e1)
+                                            self.triangle[rel_triangle] = 1
+                                            self.data_triangle["train"].append(rel_triangle)
+
 
     def saveTriangle(self,filename):
         with open(filename, "w") as f:
