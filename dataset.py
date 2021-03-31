@@ -29,6 +29,7 @@ class Dataset:
         self.relfrq = {}
         self.triangle = {}
         self.data_triangle = {}
+        self.triangle_sorted = []
         self.data = {"train": self.readFile(self.ds_path + "train.txt"),
                      "valid": self.readFile(self.ds_path + "valid.txt"),
                      "test":  self.readFile(self.ds_path + "test.txt")}
@@ -46,15 +47,17 @@ class Dataset:
         #self.saveID(self.ds_path + "rel2id.txt", self.rel2id)
         if tri_load:
             with open(self.ds_path + tri_path,"rb") as f:
-                self.data_triangle["train"] = pickle.load(f)
+                self.triangle = pickle.load(f)
                 self.saveTriangle(self.ds_path + "triangle.txt")
         else:
             self.entGraph()
             self.findTriangle()
             with open(self.ds_path + tri_path, "wb") as f:
-                pickle.dump(self.data_triangle["train"],f)
+                pickle.dump(self.triangle,f)
             self.saveTriangle(self.ds_path + "triangle.txt")
         print("done")
+        self.triangle_sorted = [k for (k,v) in sorted(self.triangle.items(),key=lambda kv: (kv[1], kv[0]),reverse=True)]
+
         self.all_facts_as_tuples = set([tuple(d) for d in self.data["train"] + self.data["valid"] + self.data["test"]])
         
         for spl in ["train", "valid", "test"]:
@@ -128,7 +131,9 @@ class Dataset:
                                 for m,rel_tuple3 in enumerate(self.ent_list_h[e3]):
                                     (r3,e,y3,m3,d3) = rel_tuple3
                                     if e == e1:
-                                        rel_triangle = (r1, r2, r3, 0)
+                                        rel_list = [r1, r2, r3]
+                                        rel_list.sort()
+                                        rel_triangle = (rel_list[0], rel_list[1], rel_list[2], 0)
                                         if rel_triangle in self.triangle:
                                             self.triangle[rel_triangle] = self.triangle[rel_triangle] + 1
                                             #print ("%d :" % e1)
@@ -170,13 +175,16 @@ class Dataset:
         with open(filename, "w") as f:
             for k,v in sorted(self.triangle.items(),key=lambda kv: (kv[1], kv[0]),reverse=True):
                 f.write("{} {}\n".format(k,v))
-        f.close()
+
 
     def saveID(self,filename,dict):
         with open(filename, "w") as f:
             for k,v in sorted(dict.items(), key=lambda kv: (kv[1], kv[0])):
                 f.write("%d %s\n" %(v,k))
-        f.close()
+
+
+    #def find_potential_triangle_top3(self):
+
 
 
     def numEnt(self):
