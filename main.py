@@ -13,7 +13,7 @@ desc = 'Temporal KG Completion methods'
 parser = argparse.ArgumentParser(description=desc)
 
 parser.add_argument('-dataset', help='Dataset', type=str, default='icews14', choices = ['icews14', 'icews05-15', 'gdelt'])
-parser.add_argument('-model', help='Model', type=str, default='DE_DistMult', choices = ['DE_DistMult', 'DE_TransE', 'DE_SimplE'])
+parser.add_argument('-model', help='Model', type=str, default='DE_DistMult', choices = ['DE_Triangle'])
 parser.add_argument('-ne', help='Number of epochs', type=int, default=500, choices = [500])
 parser.add_argument('-bsize', help='Batch size', type=int, default=512, choices = [512])
 parser.add_argument('-lr', help='Learning rate', type=float, default=0.001, choices = [0.001])
@@ -43,6 +43,7 @@ params = Params(
     se_prop=args.se_prop
 )
 
-
+trainer = Trainer(dataset, params, args.model)
+trainer.train()
 
 
