@@ -57,8 +57,7 @@ class Tester:
                 sim_scores = self.model(r1, r2, r3, years, months, days, p2, p3).cpu().data.numpy()
                 rank = self.getRank(sim_scores)
                 self.measure.update(rank, raw_or_fil)
-                    
-        
+
         self.measure.print_()
         print("~~~~~~~~~~~~~")
         self.measure.normalize(len(self.dataset.data[self.valid_or_test]))
