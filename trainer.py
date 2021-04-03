@@ -40,13 +40,13 @@ class Trainer:
             while not last_batch:
                 optimizer.zero_grad()
                 
-                heads, rels, tails, years, months, days = self.dataset.nextBatch(self.params.bsize, neg_ratio=self.params.neg_ratio)
+                r1, r2, r3, years, months, days, p2, p3 = self.dataset.nextBatch(self.params.bsize, neg_ratio=self.params.neg_ratio)
                 last_batch = self.dataset.wasLastBatch()
                 
-                scores = self.model(heads, rels, tails, years, months, days)
+                scores = self.model(r1, r2, r3, years, months, days, p2, p3)
                 
                 ###Added for softmax####
-                num_examples = int(heads.shape[0] / (1 + self.params.neg_ratio))
+                num_examples = int(r3.shape[0] / (1 + self.params.neg_ratio))
                 scores_reshaped = scores.view(num_examples, self.params.neg_ratio+1)
                 l = torch.zeros(num_examples).long().cuda()
                 loss = loss_f(scores_reshaped, l)

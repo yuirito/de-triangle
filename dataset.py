@@ -36,23 +36,20 @@ class Dataset:
                      "valid": self.readFile(self.ds_path + "valid.txt"),
                      "test":  self.readFile(self.ds_path + "test.txt")}
         self.data_triangle["train"] = []
-        #for k,v in sorted(self.relfrq.items(), key=lambda kv: (kv[1], kv[0]),reverse=True):
-            #print(k,v)
+
         self.start_batch = 0
         self.all_facts_as_tuples = None
         
         self.convertTimes()
-        #print(self.data["train"][0][3],self.data["train"][0][4],self.data["train"][0][5])
-        self.ent_list_h = [None for _ in range(self.numEnt()+1)]
+
+        self.ent_list_h = [None for _ in range(self.numEnt() + 1)]
         self.ent_list_t = [None for _ in range(self.numEnt() + 1)]
-        #self.saveID(self.ds_path + "ent2id.txt",self.ent2id)
-        #self.saveID(self.ds_path + "rel2id.txt", self.rel2id)
+        self.entGraph()
         if tri_load:
             with open(self.ds_path + tri_path,"rb") as f:
                 self.triangle = pickle.load(f)
                 self.saveTriangle(self.ds_path + "triangle.txt")
         else:
-            self.entGraph()
             self.findTriangle()
             with open(self.ds_path + tri_path, "wb") as f:
                 pickle.dump(self.triangle,f)
@@ -66,9 +63,19 @@ class Dataset:
         else:
             self.triangle_sorted = [k for (k, v) in
                                     sorted(self.triangle.items(), key=lambda kv: (kv[1], kv[0]), reverse=True)]
-            self.constructDataTri()
+            self.makeDataTri()
+            with open(self.ds_path + data_tri_path,"wb") as f:
+                pickle.dump(self.data_triangle["train"],f)
 
         print(self.factWithtri)
+
+        self.makeValidTestDataTri()
+        print("valid fact = ")
+        print(len(self.data["valid"]))
+        print(len(self.data_triangle["valid"]))
+        print("test =")
+        print(len(self.data["test"]))
+        print(len(self.data_triangle["test"]))
 
         self.all_facts_as_tuples = set([tuple(d) for d in self.data["train"] + self.data["valid"] + self.data["test"]])
         
@@ -195,7 +202,7 @@ class Dataset:
                 f.write("%d %s\n" %(v,k))
 
 
-    def constructDataTri(self):
+    def makeDataTri(self):
         i = 0
         for fact in self.data["train"]:
             print(i)
@@ -205,15 +212,79 @@ class Dataset:
             m = fact[4]
             d = fact[5]
 
-            l = self.find_potential_triangle_top3(r,y,m,d)
+            l = self.find_potential_triangle(r,y,m,d,3)
             self.factWithtri[len(l)] =  self.factWithtri[len(l)]+1
             self.data_triangle["train"] = self.data_triangle["train"]+l
 
-    def find_potential_triangle_top3(self,r,y,m,d):
+    def makeValidTestDataTri(self):
+        self.data_triangle["valid"] = []
+        self.data_triangle["test"] = []
+        i = 0
+        for validOrTest in ["valid","test"]:
+            for fact in self.data[validOrTest]:
+                print(i)
+                i = i + 1
+                (e1,r3,e2,y,m,d) = fact
+                l = self.find_potential_triangle_with_e(e1,e2,r3,y,m,d)
+                if len(l) != 0:
+                  self.data_triangle[validOrTest].append(l)
+
+    def find_potential_triangle_with_e(self,e1,e2,r3,y,m,d):
+        l = []
+        if self.ent_list_h[e1] != None:
+            for f1 in self.ent_list_h[e1]:
+                if len(l) > 1:
+                    break
+                (r1, e3, _, _, _) = f1
+                if self.ent_list_h[e3] != None:
+                    for f2 in self.ent_list_h[e3]:
+                        (r2, e, _, _, _) = f2
+                        if e == e2:
+                            l.append((r1, r2, r3, y, m, d, 1, -1))
+                            break
+
+        if self.ent_list_h[e2] != None:
+            for f1 in self.ent_list_h[e2]:
+                if len(l) > 2:
+                    break
+                (r2, e3, _, _, _) = f1
+                if self.ent_list_h[e3] != None:
+                    for f2 in self.ent_list_h[e3]:
+                        (r1, e, _, _, _) = f2
+                        if e == e1:
+                            l.append((r1, r2, r3, y, m, d, 1, 1))
+                            break
+
+        if self.ent_list_h[e1] != None:
+            for f1 in self.ent_list_h[e1]:
+                if len(l) > 3:
+                    break
+                (r1, e3, _, _, _) = f1
+                if self.ent_list_h[e2] != None:
+                    for f2 in self.ent_list_h[e2]:
+                        (r2, e, _, _, _) = f2
+                        if e == e3:
+                            l.append((r1, r2, r3, y, m, d, -1, -1))
+                            break
+
+        if self.ent_list_t[e1] != None:
+            for f1 in self.ent_list_t[e1]:
+                if len(l) > 4:
+                    break
+                (r1, e3, _, _, _) = f1
+                if self.ent_list_t[e2] != None:
+                    for f2 in self.ent_list_t[e2]:
+                        (r2, e, _, _, _) = f2
+                        if e == e3:
+                            l.append((r1, r2, r3, y, m, d, -1, 1))
+                            break
+        return l
+
+    def find_potential_triangle(self, r, y, m, d, topn=3):
         n = 0
         l=[]
         for tri in self.triangle_sorted:
-            if n == 3:
+            if n >= topn:
                 break
             else:
                 (r1,r2,r3,flag) = tri
@@ -270,13 +341,13 @@ class Dataset:
 
     
     def nextPosBatch(self, batch_size):
-        if self.start_batch + batch_size > len(self.data["train"]):
-            ret_facts = self.data["train"][self.start_batch : ]
+        if self.start_batch + batch_size > len(self.data_triangle["train"]):
+            ret_tri = self.data_triangle["train"][self.start_batch : ]
             self.start_batch = 0
         else:
-            ret_facts = self.data["train"][self.start_batch : self.start_batch + batch_size]
+            ret_tri = self.data_triangle["train"][self.start_batch : self.start_batch + batch_size]
             self.start_batch += batch_size
-        return ret_facts
+        return ret_tri
     
 
     def addNegFacts(self, bp_facts, neg_ratio):
@@ -293,24 +364,21 @@ class Dataset:
             
         return facts
     
-    def addNegFacts2(self, bp_facts, neg_ratio):
+    def addNegFacts2(self, bp_tri, neg_ratio):
         pos_neg_group_size = 1 + neg_ratio
-        facts1 = np.repeat(np.copy(bp_facts), pos_neg_group_size, axis=0)
-        facts2 = np.copy(facts1)
-        rand_nums1 = np.random.randint(low=1, high=self.numEnt(), size=facts1.shape[0])
-        rand_nums2 = np.random.randint(low=1, high=self.numEnt(), size=facts2.shape[0])
-        
-        for i in range(facts1.shape[0] // pos_neg_group_size):
+        tri1 = np.repeat(np.copy(bp_tri), pos_neg_group_size, axis=0)
+        rand_nums1 = np.random.randint(low=1, high=self.numRel(), size=tri1.shape[0])
+
+        for i in range(tri1.shape[0] // pos_neg_group_size):
             rand_nums1[i * pos_neg_group_size] = 0
-            rand_nums2[i * pos_neg_group_size] = 0
-        
-        facts1[:,0] = (facts1[:,0] + rand_nums1) % self.numEnt()
-        facts2[:,2] = (facts2[:,2] + rand_nums2) % self.numEnt()
-        return np.concatenate((facts1, facts2), axis=0)
+
+        tri1[:,2] = (tri1[:,2] + rand_nums1) % self.numRel()
+
+        return tri1
     
     def nextBatch(self, batch_size, neg_ratio=1):
-        bp_facts = self.nextPosBatch(batch_size)
-        batch = shredFacts(self.addNegFacts2(bp_facts, neg_ratio))
+        bp_tri = self.nextPosBatch(batch_size)
+        batch = shredFacts(self.addNegFacts2(bp_tri, neg_ratio))
         return batch
     
     

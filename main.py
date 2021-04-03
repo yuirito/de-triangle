@@ -7,6 +7,7 @@
 import argparse
 from dataset import Dataset
 from trainer import Trainer
+from tester import Tester
 from params import Params
 
 desc = 'Temporal KG Completion methods'
@@ -46,4 +47,22 @@ params = Params(
 trainer = Trainer(dataset, params, args.model)
 trainer.train()
 
+# validating the trained models. we seect the model that has the best validation performance as the fina model
+validation_idx = [str(int(args.save_each * (i + 1))) for i in range(args.ne // args.save_each)]
+best_mrr = -1.0
+best_index = '0'
+model_prefix = "models/" + args.model + "/" + args.dataset + "/" + params.str_() + "_"
 
+for idx in validation_idx:
+    model_path = model_prefix + idx + ".chkpnt"
+    tester = Tester(dataset, model_path, "valid")
+    mrr = tester.test()
+    if mrr > best_mrr:
+        best_mrr = mrr
+        best_index = idx
+
+# testing the best chosen model on the test set
+print("Best epoch: " + best_index)
+model_path = model_prefix + best_index + ".chkpnt"
+tester = Tester(dataset, model_path, "test")
+tester.test()

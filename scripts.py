@@ -15,3 +15,16 @@ def shredFacts(facts): #takes a batch of facts and shreds it into its columns
     months = torch.tensor(facts[:,4]).float().cuda()
     days = torch.tensor(facts[:,5]).float().cuda()
     return heads, rels, tails, years, months, days
+
+
+def shredTriangle(tri):  # takes a batch of facts and shreds it into its columns
+
+    r1 = torch.tensor(tri[:, 0]).long().cuda()
+    r2= torch.tensor(tri[:, 1]).long().cuda()
+    r3 = torch.tensor(tri[:, 2]).long().cuda()
+    years = torch.tensor(tri[:, 3]).float().cuda()
+    months = torch.tensor(tri[:, 4]).float().cuda()
+    days = torch.tensor(tri[:, 5]).float().cuda()
+    p2 = torch.tensor(tri[:, 6]).float().cuda()
+    p3 = torch.tensor(tri[:, 7]).float().cuda()
+    return r1, r2, r3, years, months, days, p2, p3
