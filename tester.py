@@ -58,6 +58,7 @@ class Tester:
                 rank = self.getRank(sim_scores)
                 self.measure.update(rank, raw_or_fil)
 
+
         self.measure.print_()
         print("~~~~~~~~~~~~~")
         self.measure.normalize(len(self.dataset.data[self.valid_or_test]))
