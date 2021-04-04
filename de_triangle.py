@@ -87,4 +87,5 @@ class DE_Triangle(torch.nn.Module):
         scores = r1_embs + p2 * r2_embs + p3 * r3_embs
         scores = F.dropout(scores, p=self.params.dropout, training=self.training)
         scores = -torch.norm(scores, dim = 1)
+
         return scores
