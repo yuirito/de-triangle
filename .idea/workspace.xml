@@ -123,7 +123,14 @@
       <option name="project" value="LOCAL" />
       <updated>1617526963712</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="de-triangle hit@10=0.14 MRR=0.069 4.4">
+      <created>1617527224734</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1617527224734</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
