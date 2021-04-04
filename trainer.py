@@ -11,7 +11,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from dataset import Dataset
 from params import Params
-
+from de_triangle import DE_Triangle
 
 class Trainer:
     def __init__(self, dataset, params, model_name):

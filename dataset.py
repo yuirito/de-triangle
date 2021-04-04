@@ -11,7 +11,7 @@ import time
 import numpy as np
 from random import shuffle
 import pickle
-from scripts import shredFacts
+from scripts import shredTriangle
 
 class Dataset:
     """Implements the specified dataloader"""
@@ -60,16 +60,23 @@ class Dataset:
         if data_tri_load:
             with open(self.ds_path + data_tri_path,"rb") as f:
                 self.data_triangle["train"] = pickle.load(f)
+            with open(self.ds_path + "data_tri_valid_dump", "rb") as f:
+                self.data_triangle["valid"] = pickle.load(f)
+            with open(self.ds_path + "data_tri_test_dump", "rb") as f:
+                self.data_triangle["test"] = pickle.load(f)
         else:
             self.triangle_sorted = [k for (k, v) in
                                     sorted(self.triangle.items(), key=lambda kv: (kv[1], kv[0]), reverse=True)]
             self.makeDataTri()
+            self.makeValidTestDataTri()
             with open(self.ds_path + data_tri_path,"wb") as f:
                 pickle.dump(self.data_triangle["train"],f)
+            with open(self.ds_path + "data_tri_valid_dump", "wb") as f:
+                pickle.dump(self.data_triangle["valid"], f)
+            with open(self.ds_path + "data_tri_test_dump", "wb") as f:
+                pickle.dump(self.data_triangle["test"], f)
 
-        print(self.factWithtri)
 
-        self.makeValidTestDataTri()
         print("valid fact = ")
         print(len(self.data["valid"]))
         print(len(self.data_triangle["valid"]))
@@ -378,7 +385,7 @@ class Dataset:
     
     def nextBatch(self, batch_size, neg_ratio=1):
         bp_tri = self.nextPosBatch(batch_size)
-        batch = shredFacts(self.addNegFacts2(bp_tri, neg_ratio))
+        batch = shredTriangle(self.addNegFacts2(bp_tri, neg_ratio))
         return batch
     
     

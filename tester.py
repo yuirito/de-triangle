@@ -46,7 +46,7 @@ class Tester:
             for i in range (n):
                 r1,r2,r3,y,m,d,p2,p3 = ret_tri[n*(id+1)+i]
                 ret_tri[n * (id + 1) + i] = (r1,r2,id,y,m,d,p2,p3)
-        return shredFacts(np.array(ret_tri))
+        return shredTriangle(np.array(ret_tri))
     
     def test(self):
         for i, tri_l in enumerate(self.dataset.data_triangle[self.valid_or_test]):
