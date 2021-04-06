@@ -43,7 +43,7 @@ params = Params(
     save_each=args.save_each, 
     se_prop=args.se_prop
 )
-
+"""
 trainer = Trainer(dataset, params, args.model)
 trainer.train()
 
@@ -66,3 +66,5 @@ print("Best epoch: " + best_index)
 model_path = model_prefix + best_index + ".chkpnt"
 tester = Tester(dataset, model_path, "test")
 tester.test()
+"""
+

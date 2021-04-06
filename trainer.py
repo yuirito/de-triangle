@@ -40,10 +40,10 @@ class Trainer:
             while not last_batch:
                 optimizer.zero_grad()
                 
-                r1, r2, r3, years, months, days, p2, p3 = self.dataset.nextBatch(self.params.bsize, neg_ratio=self.params.neg_ratio)
+                r1, r2, r3, years, months, days, p2, p3, e1, e2 = self.dataset.nextBatch(self.params.bsize, neg_ratio=self.params.neg_ratio)
                 last_batch = self.dataset.wasLastBatch()
                 
-                scores = self.model(r1, r2, r3, years, months, days, p2, p3)
+                scores = self.model(r1, r2, r3, years, months, days, p2, p3 , e1, e2)
                 
                 ###Added for softmax####
                 num_examples = int(r3.shape[0] / (1 + self.params.neg_ratio))

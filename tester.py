@@ -53,8 +53,8 @@ class Tester:
             settings = ["fil"]
             self.tri_l_len = len(tri_l)
             for raw_or_fil in settings:
-                r1, r2, r3, years, months, days, p2, p3 = self.replaceAndShred(tri_l, raw_or_fil)
-                sim_scores = self.model(r1, r2, r3, years, months, days, p2, p3).cpu().data.numpy()
+                r1, r2, r3, years, months, days, p2, p3, e1, e2 = self.replaceAndShred(tri_l, raw_or_fil)
+                sim_scores = self.model(r1, r2, r3, years, months, days, p2, p3, e1, e2).cpu().data.numpy()
                 rank = self.getRank(sim_scores)
                 self.measure.update(rank, raw_or_fil)
 

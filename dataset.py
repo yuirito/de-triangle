@@ -30,7 +30,7 @@ class Dataset:
         self.triangle = {}
         self.data_triangle = {}
         self.triangle_sorted = []
-        self.factWithtri = [0,0,0,0]
+        self.factWithtri = [0 for _ in range(11)]
 
         self.data = {"train": self.readFile(self.ds_path + "train.txt"),
                      "valid": self.readFile(self.ds_path + "valid.txt"),
@@ -76,7 +76,7 @@ class Dataset:
             with open(self.ds_path + "data_tri_test_dump", "wb") as f:
                 pickle.dump(self.data_triangle["test"], f)
 
-
+        print(self.factWithtri)
         print("valid fact = ")
         print(len(self.data["valid"]))
         print(len(self.data_triangle["valid"]))
@@ -214,17 +214,20 @@ class Dataset:
         for fact in self.data["train"]:
             print(i)
             i = i + 1
+            e1 = fact[0]
+            e2 = fact[2]
             r = fact[1]
             y = fact[3]
             m = fact[4]
             d = fact[5]
 
-            l = self.find_potential_triangle(r,y,m,d,3)
+            l = self.find_potential_triangle(r,y,m,d,4)
+            l = l + [e1,e2]
             self.factWithtri[len(l)] =  self.factWithtri[len(l)]+1
             self.data_triangle["train"] = self.data_triangle["train"]+l
 
     def makeValidTestDataTri(self):
-        self.data_triangle["valid"] = []
+        self.data_triangle["valid"] = [];
         self.data_triangle["test"] = []
         i = 0
         for validOrTest in ["valid","test"]:
@@ -234,7 +237,8 @@ class Dataset:
                 (e1,r3,e2,y,m,d) = fact
                 l = self.find_potential_triangle_with_e(e1,e2,r3,y,m,d)
                 if len(l) != 0:
-                  self.data_triangle[validOrTest].append(l)
+                    l = l + [e1,e2]
+                    self.data_triangle[validOrTest].append(l)
 
     def find_potential_triangle_with_e(self,e1,e2,r3,y,m,d):
         l = []

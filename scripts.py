@@ -27,4 +27,6 @@ def shredTriangle(tri):  # takes a batch of facts and shreds it into its columns
     days = torch.tensor(tri[:, 5]).float().cuda()
     p2 = torch.tensor(tri[:, 6]).float().cuda()
     p3 = torch.tensor(tri[:, 7]).float().cuda()
-    return r1, r2, r3, years, months, days, p2, p3
+    e1 = torch.tensor(tri[:, 8]).long().cuda()
+    e2 = torch.tensor(tri[:, 9]).long().cuda()
+    return r1, r2, r3, years, months, days, p2, p3, e1, e2
