@@ -43,6 +43,7 @@ params = Params(
     save_each=args.save_each, 
     se_prop=args.se_prop
 )
+
 """
 trainer = Trainer(dataset, params, args.model)
 trainer.train()
