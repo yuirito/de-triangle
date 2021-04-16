@@ -71,7 +71,8 @@ class DE_Triangle(torch.nn.Module):
         months = months.view(-1,1)
         days = days.view(-1,1)
 
-        r1_emb,r2_emb,r3_emb = self.rel_embs(r1), self.rel_embs(r2), self.rel_embs(r3)
+        #r1_emb,r2_emb = self.rel_embs(r1), self.rel_embs(r2)
+        r3_emb = self.rel_embs(r3)
         e1_emb,e2_emb = self.ent_embs(e1),self.ent_embs(e2)
         e1_emb_t = self.get_time_embedd(e1,years,months,days)
         e2_emb_t = self.get_time_embedd(e1, years, months, days)
@@ -79,16 +80,16 @@ class DE_Triangle(torch.nn.Module):
         e1_emb = torch.cat((e1_emb, e1_emb_t), 1)
         e2_emb = torch.cat((e2_emb, e2_emb_t), 1)
 
-        return r1_emb, r2_emb, r3_emb , e1_emb, e2_emb
+        return  r3_emb , e1_emb, e2_emb
     
     def forward(self, r1, r2, r3, years, months, days, p2, p3, e1, e2):
-        r1_embs, r2_embs, r3_embs,e1_emb,e2_emb = self.getEmbeddings(r1, r2, r3, years, months, days,e1,e2)
-        p2 = p2.view(-1,1)
-        p3 = p3.view(-1,1)
-        p2 = p2.repeat(1,self.params.s_emb_dim+self.params.t_emb_dim)
-        p3 = p3.repeat(1,self.params.s_emb_dim+self.params.t_emb_dim)
+        r3_embs,e1_emb,e2_emb = self.getEmbeddings(r1, r2, r3, years, months, days,e1,e2)
+        #p2 = p2.view(-1,1)
+        #p3 = p3.view(-1,1)
+        #p2 = p2.repeat(1,self.params.s_emb_dim+self.params.t_emb_dim)
+        #p3 = p3.repeat(1,self.params.s_emb_dim+self.params.t_emb_dim)
 
-        scores = self.params.beta*(r1_embs + p2 * r2_embs + p3 * r3_embs) + (1-self.params.beta)*(e1_emb +e2_emb -r3_embs)
+        scores = (e1_emb +e2_emb -r3_embs)
         scores = F.dropout(scores, p=self.params.dropout, training=self.training)
         scores = -torch.norm(scores, dim = 1)
 

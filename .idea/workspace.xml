@@ -1,7 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="31fa58ec-ce6c-4ad6-886e-2743569e158e" name="Default Changelist" comment="de-triangle hit@10=0.14 MRR=0.069 4.4" />
+    <list default="true" id="31fa58ec-ce6c-4ad6-886e-2743569e158e" name="Default Changelist" comment="de-triangle hit@10=0.14 MRR=0.069 4.4">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/dataset.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/datasets/icews14/data_tri_dump.txt" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/icews14/data_tri_dump.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/datasets/icews14/data_tri_test_dump" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/icews14/data_tri_test_dump" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/datasets/icews14/data_tri_valid_dump" beforeDir="false" afterPath="$PROJECT_DIR$/datasets/icews14/data_tri_valid_dump" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/de_triangle.py" beforeDir="false" afterPath="$PROJECT_DIR$/de_triangle.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/params.py" beforeDir="false" afterPath="$PROJECT_DIR$/params.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tester.py" beforeDir="false" afterPath="$PROJECT_DIR$/tester.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/trainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/trainer.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -10,7 +21,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="de-triangle" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -191,7 +202,14 @@
       <option name="project" value="LOCAL" />
       <updated>1617699641858</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="de-transe+triangle 4.6">
+      <created>1617699702059</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1617699702059</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

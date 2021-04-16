@@ -83,6 +83,7 @@ class Dataset:
         print("test =")
         print(len(self.data["test"]))
         print(len(self.data_triangle["test"]))
+        print(self.data_triangle["train"][0])
 
         self.all_facts_as_tuples = set([tuple(d) for d in self.data["train"] + self.data["valid"] + self.data["test"]])
         
@@ -221,8 +222,8 @@ class Dataset:
             m = fact[4]
             d = fact[5]
 
-            l = self.find_potential_triangle(r,y,m,d,4)
-            l = l + [e1,e2]
+            l = self.find_potential_triangle(e1,e2,r,y,m,d,2)
+
             self.factWithtri[len(l)] =  self.factWithtri[len(l)]+1
             self.data_triangle["train"] = self.data_triangle["train"]+l
 
@@ -237,7 +238,6 @@ class Dataset:
                 (e1,r3,e2,y,m,d) = fact
                 l = self.find_potential_triangle_with_e(e1,e2,r3,y,m,d)
                 if len(l) != 0:
-                    l = l + [e1,e2]
                     self.data_triangle[validOrTest].append(l)
 
     def find_potential_triangle_with_e(self,e1,e2,r3,y,m,d):
@@ -251,7 +251,7 @@ class Dataset:
                     for f2 in self.ent_list_h[e3]:
                         (r2, e, _, _, _) = f2
                         if e == e2:
-                            l.append((r1, r2, r3, y, m, d, 1, -1))
+                            l.append((r1, r2, r3, y, m, d, 1, -1, e1, e2))
                             break
 
         if self.ent_list_h[e2] != None:
@@ -263,7 +263,7 @@ class Dataset:
                     for f2 in self.ent_list_h[e3]:
                         (r1, e, _, _, _) = f2
                         if e == e1:
-                            l.append((r1, r2, r3, y, m, d, 1, 1))
+                            l.append((r1, r2, r3, y, m, d, 1, 1, e1, e2))
                             break
 
         if self.ent_list_h[e1] != None:
@@ -275,7 +275,7 @@ class Dataset:
                     for f2 in self.ent_list_h[e2]:
                         (r2, e, _, _, _) = f2
                         if e == e3:
-                            l.append((r1, r2, r3, y, m, d, -1, -1))
+                            l.append((r1, r2, r3, y, m, d, -1, -1, e1, e2))
                             break
 
         if self.ent_list_t[e1] != None:
@@ -287,11 +287,11 @@ class Dataset:
                     for f2 in self.ent_list_t[e2]:
                         (r2, e, _, _, _) = f2
                         if e == e3:
-                            l.append((r1, r2, r3, y, m, d, -1, 1))
+                            l.append((r1, r2, r3, y, m, d, -1, 1, e1, e2))
                             break
         return l
 
-    def find_potential_triangle(self, r, y, m, d, topn=3):
+    def find_potential_triangle(self, e1,e2,r, y, m, d, topn=3):
         n = 0
         l=[]
         for tri in self.triangle_sorted:
@@ -301,23 +301,23 @@ class Dataset:
                 (r1,r2,r3,flag) = tri
                 if flag == 0:
                     if r1 == r:
-                        l.append((r2, r3, r, y, m, d, 1, 1))
+                        l.append((r2, r3, r, y, m, d, 1, 1,e1,e2))
                         n=n+1
                     elif r2 == r:
-                        l.append((r3, r1, r, y, m, d, 1, 1))
+                        l.append((r3, r1, r, y, m, d, 1, 1, e1, e2))
                         n = n + 1
                     elif r3 == r:
-                        l.append((r1, r2, r, y, m, d, 1, 1))
+                        l.append((r1, r2, r, y, m, d, 1, 1, e1, e2))
                         n = n + 1
                 elif flag == 1:
                     if r1 == r:
-                        l.append((r2, r3, r, y, m, d, 1, -1))
+                        l.append((r2, r3, r, y, m, d, 1, -1,e1,e2))
                         n=n+1
                     elif r2 == r:
-                        l.append((r1, r3, r, y, m, d, -1, -1))
+                        l.append((r1, r3, r, y, m, d, -1, -1,e1,e2))
                         n = n + 1
                     elif r3 == r:
-                        l.append((r2, r1, r, y, m, d, -1, 1))
+                        l.append((r2, r1, r, y, m, d, -1, 1,e1,e2))
                         n = n + 1
         return l
 
@@ -383,13 +383,29 @@ class Dataset:
         for i in range(tri1.shape[0] // pos_neg_group_size):
             rand_nums1[i * pos_neg_group_size] = 0
 
-        tri1[:,2] = (tri1[:,2] + rand_nums1) % self.numRel()
+        tri1[:, 2] = (tri1[:, 2] + rand_nums1) % self.numRel()
 
         return tri1
+
+    def addNegFacts3(self, bp_tri, neg_ratio):
+        pos_neg_group_size = 1 + neg_ratio
+        facts1 = np.repeat(np.copy(bp_tri), pos_neg_group_size, axis=0)
+        facts2 = np.copy(facts1)
+        rand_nums1 = np.random.randint(low=1, high=self.numEnt(), size=facts1.shape[0])
+        rand_nums2 = np.random.randint(low=1, high=self.numEnt(), size=facts2.shape[0])
+
+        for i in range(facts1.shape[0] // pos_neg_group_size):
+            rand_nums1[i * pos_neg_group_size] = 0
+            rand_nums2[i * pos_neg_group_size] = 0
+
+        facts1[:, 8] = (facts1[:, 8] + rand_nums1) % self.numEnt()
+        facts2[:, 9] = (facts2[:, 9] + rand_nums2) % self.numEnt()
+        return np.concatenate((facts1, facts2), axis=0)
     
     def nextBatch(self, batch_size, neg_ratio=1):
         bp_tri = self.nextPosBatch(batch_size)
-        batch = shredTriangle(self.addNegFacts2(bp_tri, neg_ratio))
+
+        batch = shredTriangle(self.addNegFacts3(bp_tri, neg_ratio))
         return batch
     
     

@@ -12,6 +12,7 @@ import torch.nn.functional as F
 from dataset import Dataset
 from params import Params
 from de_triangle import DE_Triangle
+from de_distmult_tri import DE_DistMult_Tri
 
 class Trainer:
     def __init__(self, dataset, params, model_name):

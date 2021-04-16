@@ -40,12 +40,27 @@ class Tester:
 
         n = len(tri_l)
         ret_tri = [tri_l for i in range(self.dataset.numRel()+1)]
-        ret_tri = np.array(ret_tri).reshape(-1,8)
+        ret_tri = np.array(ret_tri).reshape(-1,10)
         ret_tri = [tuple(tri) for tri in ret_tri]
         for id in range(self.dataset.numRel()):
             for i in range (n):
-                r1,r2,r3,y,m,d,p2,p3 = ret_tri[n*(id+1)+i]
-                ret_tri[n * (id + 1) + i] = (r1,r2,id,y,m,d,p2,p3)
+                r1,r2,r3,y,m,d,p2,p3,e1,e2 = ret_tri[n*(id+1)+i]
+                ret_tri[n * (id + 1) + i] = (r1,r2,id,y,m,d,p2,p3,e1,e2)
+        return shredTriangle(np.array(ret_tri))
+
+    def replaceAndShred1(self, tri_l, raw_or_fil, head_or_tail):
+        n = len(tri_l)
+        ret_tri = [tri_l for i in range(self.dataset.numEnt() + 1)]
+        ret_tri = np.array(ret_tri).reshape(-1, 10)
+        ret_tri = [tuple(tri) for tri in ret_tri]
+        for id in range(self.dataset.numEnt()):
+            for i in range(n):
+                r1, r2, r3, y, m, d, p2, p3, e1, e2 = ret_tri[n * (id + 1) + i]
+                if head_or_tail == "head":
+                    ret_tri[n * (id + 1) + i] = (r1, r2, r3, y, m, d, p2, p3, id, e2)
+
+                if head_or_tail == "tail":
+                    ret_tri[n * (id + 1) + i] = (r1, r2, r3, y, m, d, p2, p3, e1, id)
         return shredTriangle(np.array(ret_tri))
     
     def test(self):
@@ -53,10 +68,11 @@ class Tester:
             settings = ["fil"]
             self.tri_l_len = len(tri_l)
             for raw_or_fil in settings:
-                r1, r2, r3, years, months, days, p2, p3, e1, e2 = self.replaceAndShred(tri_l, raw_or_fil)
-                sim_scores = self.model(r1, r2, r3, years, months, days, p2, p3, e1, e2).cpu().data.numpy()
-                rank = self.getRank(sim_scores)
-                self.measure.update(rank, raw_or_fil)
+                for head_or_tail in ["head", "tail"]:
+                   r1, r2, r3, years, months, days, p2, p3, e1, e2 = self.replaceAndShred1(tri_l, raw_or_fil,head_or_tail)
+                   sim_scores = self.model(r1, r2, r3, years, months, days, p2, p3, e1, e2).cpu().data.numpy()
+                   rank = self.getRank(sim_scores)
+                   self.measure.update(rank, raw_or_fil)
 
 
         self.measure.print_()
